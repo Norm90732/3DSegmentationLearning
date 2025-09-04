@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 class ConvolutionalBlock(nn.Module):
     def __init__(self,input_channels,output_channels,kernel_size, padding, stride, dilation,dropoutprob):

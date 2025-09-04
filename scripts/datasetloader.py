@@ -65,17 +65,6 @@ train_ds = Dataset(training_dataset,transform=train_transforms)
 validation_ds = Dataset(validation_dataset,transform=val_transforms)
 testing_ds = Dataset(test_dataset,transform=val_transforms)
 
-training_dataloader = DataLoader(train_ds,shuffle=True,num_workers=0,pin_memory=True,batch_size = 8)
-validation_dataloader = DataLoader(validation_ds,shuffle=False,num_workers=0,pin_memory=True,batch_size = 8)
-testing_dataloader = DataLoader(testing_ds,shuffle=False,num_workers=0,pin_memory=True,batch_size = 8)
 
-print(len(training_dataloader))
-print(len(validation_dataloader))
-print(len(testing_dataloader))
-train_batch = next(iter(training_dataloader))
-train_features = train_batch["image"]
-train_labels = train_batch["label"]
-print(f"Feature batch shape: {train_features.size()}")
-print(f"Labels batch shape: {train_labels.size()}")
 
 

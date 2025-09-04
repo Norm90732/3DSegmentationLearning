@@ -1,4 +1,4 @@
-import torch
+
 import torch.nn as nn
 from layerModules import ConvolutionalBlock,EncoderBlock,DecoderBlock,BottleNeckBlock
 
@@ -40,10 +40,3 @@ class Basic3DUnet(nn.Module):
         result = self.onebyone(decode4)
         return result
  
-device = 'cuda'
-x = torch.rand(4,1,96,96,96).to(device)
-model = Basic3DUnet(input_channels=1,output_channel=10,dropoutProb=.1).to(device)
-result = model(x)
-print(x.shape)
-print(result.shape)
-
