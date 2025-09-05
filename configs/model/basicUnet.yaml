@@ -1,0 +1,6 @@
+name: basicUnet
+
+input_channels: 1
+
+search_space:
+  dropout: "tune.uniform(0.1,0.5)"

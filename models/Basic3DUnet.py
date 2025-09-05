@@ -1,28 +1,28 @@
 
 import torch.nn as nn
-from layerModules import ConvolutionalBlock,EncoderBlock,DecoderBlock,BottleNeckBlock
+from .layerModules import ConvolutionalBlock,EncoderBlock,DecoderBlock,BottleNeckBlock
 
 
 class Basic3DUnet(nn.Module):
     def __init__(self,input_channels, output_channel, dropoutProb):
         super().__init__()
         #Encoder Blocks
-        self.encoding1 = EncoderBlock(input_channel=input_channels,output_channels=64, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
-        self.encoding2 = EncoderBlock(input_channel=64,output_channels=128, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
-        self.encoding3 = EncoderBlock(input_channel=128,output_channels=256, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
-        self.encoding4 = EncoderBlock(input_channel=256,output_channels=512, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
+        self.encoding1 = EncoderBlock(input_channel=input_channels,output_channels=32, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
+        self.encoding2 = EncoderBlock(input_channel=32,output_channels=64, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
+        self.encoding3 = EncoderBlock(input_channel=64,output_channels=128, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
+        self.encoding4 = EncoderBlock(input_channel=128,output_channels=256, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
         
         #Bottle Neck Block
-        self.bottleneck = BottleNeckBlock(input_channel=512, output_channels=1024, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
+        self.bottleneck = BottleNeckBlock(input_channel=256, output_channels=512, kernel_size=3, padding=1, stride=1, dilation=1,dropoutProb=dropoutProb)
         
         #Decoder blocks
-        self.decoder1 = DecoderBlock(input_channel=1024, output_channels=512, kernel_size=3, padding=1, stride=2, dilation=1, dropoutProb=dropoutProb,outputPadding=1)
-        self.decoder2 = DecoderBlock(input_channel=512, output_channels=256, kernel_size=3, padding=1, stride=2, dilation=1, dropoutProb=dropoutProb,outputPadding=1)
-        self.decoder3 = DecoderBlock(input_channel=256, output_channels=128, kernel_size=3, padding=1, stride=2, dilation=1, dropoutProb=dropoutProb,outputPadding=1)
-        self.decoder4 = DecoderBlock(input_channel=128, output_channels=64, kernel_size=3, padding=1, stride=2, dilation=1, dropoutProb=dropoutProb,outputPadding=1)
+        self.decoder1 = DecoderBlock(input_channel=512, output_channels=256, kernel_size=3, padding=1, stride=2, dilation=1, dropoutProb=dropoutProb,outputPadding=1)
+        self.decoder2 = DecoderBlock(input_channel=256, output_channels=128, kernel_size=3, padding=1, stride=2, dilation=1, dropoutProb=dropoutProb,outputPadding=1)
+        self.decoder3 = DecoderBlock(input_channel=128, output_channels=64, kernel_size=3, padding=1, stride=2, dilation=1, dropoutProb=dropoutProb,outputPadding=1)
+        self.decoder4 = DecoderBlock(input_channel=64, output_channels=32, kernel_size=3, padding=1, stride=2, dilation=1, dropoutProb=dropoutProb,outputPadding=1)
 
         #One by one conv
-        self.onebyone = nn.Conv3d(in_channels=64,out_channels=output_channel,kernel_size=1,padding=0,stride=1,dilation=1)
+        self.onebyone = nn.Conv3d(in_channels=32,out_channels=output_channel,kernel_size=1,padding=0,stride=1,dilation=1)
     
     def forward(self,x):
         skip1, encode1 = self.encoding1(x)

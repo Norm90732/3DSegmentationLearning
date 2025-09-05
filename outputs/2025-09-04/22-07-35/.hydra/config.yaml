@@ -1,0 +1,25 @@
+model:
+  name: basicUnet
+  input_channels: 1
+  search_space:
+    dropout: tune.uniform(0.1,0.5)
+params:
+  search_space:
+    lambda_dice: tune.uniform(0.3,0.9)
+    lr: tune.loguniform(1e-5,1e-3)
+    weight_decay: tune.loguniform(1e-4,1e-2)
+    eta_min: tune.loguniform(1e-7,1e-5)
+    T_0: tune.choice([10,15,20])
+    T_mult: tune.choice([1,2])
+training:
+  numEpochs: 20
+  num_classes: 2
+  batch_size: 4
+ray_config:
+  num_workers: 2
+  cpus_per_worker: 5
+  max_concurrent_trials: 3
+  num_samples: 100
+wandb:
+  project: 3DUnetSweep
+  log_config: true

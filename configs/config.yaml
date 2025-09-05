@@ -1,0 +1,33 @@
+defaults:
+- model: basicUnet
+- _self_
+
+#General Search Space for Model Training
+params:
+  search_space:
+    lambda_dice: "tune.uniform(0.3,0.9)"
+    lr: "tune.loguniform(1e-5,1e-3)"
+    weight_decay: "tune.loguniform(1e-4,1e-2)"
+    eta_min: "tune.loguniform(1e-7,1e-5)"
+    T_0: "tune.choice([15,20,25,30,35])"
+    T_mult: "tune.choice([1,2])"
+
+#Static
+training:
+  numEpochs: 50
+  num_classes: 2
+  batch_size: 64
+
+#Ray set up 
+ray_config:
+  num_workers: 2
+  cpus_per_worker: 5
+  max_concurrent_trials: 3
+  num_samples: 100
+
+
+#WANDB
+wandb:
+  project: "3DUnetSweep"
+  log_config: True
+

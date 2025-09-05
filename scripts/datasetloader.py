@@ -38,6 +38,7 @@ train_transforms = Compose(
         ),
     ]
 )
+
 val_transforms = Compose(
     [
         LoadImaged(keys=["image", "label"]),
@@ -53,6 +54,16 @@ val_transforms = Compose(
         CropForegroundd(keys=["image", "label"], source_key="image", allow_smaller=True),
         Orientationd(keys=["image", "label"], axcodes="RAS"),
         Spacingd(keys=["image", "label"], pixdim=(1.5, 1.5, 2.0), mode=("bilinear", "nearest")),
+        RandCropByPosNegLabeld(
+            keys=["image", "label"],
+            label_key="label",
+            spatial_size=(96, 96, 96),
+            pos=1,
+            neg=0,
+            num_samples=4,
+            image_key="image",
+            image_threshold=0,
+        ),
     ]
 )
 
