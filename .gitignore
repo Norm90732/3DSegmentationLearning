@@ -125,3 +125,10 @@ data/
 condaenv.*.requirements.txt
 /environment.yml
 .conda
+
+# Excluded folders
+!/wandb/
+!/visualizationexamples/
+!/outputs/
+!/FinalModelTraining/
+!/final_models/```
