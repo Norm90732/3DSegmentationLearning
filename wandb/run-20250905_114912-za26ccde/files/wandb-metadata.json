@@ -1,0 +1,90 @@
+{
+  "os": "Linux-5.14.0-503.40.1.el9_5.x86_64-x86_64-with-glibc2.34",
+  "python": "CPython 3.11.13",
+  "startedAt": "2025-09-05T15:49:12.176336Z",
+  "program": "/blue/uf-dsi/normansmith/projects/3DSegmentationLearning/scripts/training.py",
+  "codePath": "scripts/training.py",
+  "codePathLocal": "scripts/training.py",
+  "git": {
+    "remote": "https://github.com/Norm90732/3DSegmentationLearning.git",
+    "commit": "6152c12e5cb1807f7235e47c5eaa3e6e84fbc6f5"
+  },
+  "email": "normansmith@ufl.edu",
+  "root": "/blue/uf-dsi/normansmith/projects/3DSegmentationLearning",
+  "host": "c1009a-s15.ufhpc",
+  "executable": "/blue/uf-dsi/normansmith/.conda/envs/ThreeDSeg/bin/python",
+  "cpu_count": 112,
+  "cpu_count_logical": 112,
+  "gpu": "NVIDIA B200",
+  "gpu_count": 2,
+  "disk": {
+    "/": {
+      "total": "41922297856",
+      "used": "13401530368"
+    }
+  },
+  "memory": {
+    "total": "2163693424640"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA B200",
+      "memoryTotal": "192265846784",
+      "cudaCores": 18944,
+      "architecture": "Blackwell",
+      "uuid": "GPU-e2db1c74-9783-ab93-08a1-ead9b0c76888"
+    },
+    {
+      "name": "NVIDIA B200",
+      "memoryTotal": "192265846784",
+      "cudaCores": 18944,
+      "architecture": "Blackwell",
+      "uuid": "GPU-03aa6682-a76f-b13c-08c4-a49b9a58530f"
+    }
+  ],
+  "cudaVersion": "12.8",
+  "slurm": {
+    "cluster_name": "hipergator",
+    "conf": "/opt/slurm/etc/slurm.conf",
+    "cpus_on_node": "35",
+    "cpus_per_task": "35",
+    "export_env": "NONE",
+    "get_user_env": "1",
+    "gpus_on_node": "2",
+    "gtids": "0",
+    "job_account": "uf-dsi",
+    "job_cpus_per_node": "35",
+    "job_end_time": "1757096348",
+    "job_gid": "3058",
+    "job_gpus": "0,2",
+    "job_id": "11912582",
+    "job_name": "sys/dashboard/sys/jupyter",
+    "job_nodelist": "c1009a-s15",
+    "job_num_nodes": "1",
+    "job_partition": "hpg-b200",
+    "job_qos": "uf-dsi",
+    "job_start_time": "1757085548",
+    "job_uid": "2540",
+    "job_user": "normansmith",
+    "jobid": "11912582",
+    "localid": "0",
+    "mem_per_node": "262144",
+    "nnodes": "1",
+    "nodeid": "0",
+    "nodelist": "c1009a-s15",
+    "nprocs": "1",
+    "ntasks": "1",
+    "oom_kill_step": "0",
+    "prio_process": "0",
+    "procid": "0",
+    "submit_dir": "/var/www/ood/apps/sys/dashboard",
+    "submit_host": "ondemand4.ufhpc",
+    "task_pid": "3658512",
+    "tasks_per_node": "1",
+    "tmpdir": "/scratch/local/11912582",
+    "topology_addr": "ibswb200.ibsw0908.c1009a-s15",
+    "topology_addr_pattern": "switch.switch.node",
+    "tres_per_task": "cpu=35"
+  },
+  "writerId": "83g9sl102eb1e8tqxq8egeuun8wp1kd3"
+}

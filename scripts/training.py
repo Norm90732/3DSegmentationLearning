@@ -6,10 +6,9 @@ import torch
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 import torch.nn.functional as F
-import torchvision
+
 #Data
 from monai.data import DataLoader
-
 from datasetloader import train_ds, validation_ds, testing_ds
 from torchmetrics.segmentation import DiceScore
 from monai.metrics import DiceMetric, MeanIoU as MeanIoUMetric
@@ -19,6 +18,7 @@ import monai
 from models.layerModules import *
 from models.Basic3DUnet import *
 import wandb
+
 #Ray
 import ray
 from ray import tune, train
@@ -159,6 +159,109 @@ def objective(config):
             "epoch": epoch
         })
     
+def test(config):
+    training_dataset_ref = config.pop("training_dataset")
+    validation_dataset_ref = config.pop("validation_dataset")
+    test_dataset_ref = config.pop("testing_dataset")
+    
+    training_dataset = ray.get(training_dataset_ref)
+    validation_dataset = ray.get(validation_dataset_ref)
+    testing_dataset = ray.get(test_dataset_ref)
+    
+    numClasses = config['num_classes']
+    batch_size = config["batch_size"]
+    numTestEpochs = config["numEpochsTest"]
+    
+    
+    training_dataloader = DataLoader(training_dataset,
+                                     shuffle=True,num_workers=0,pin_memory=True,batch_size=batch_size)
+    
+    validation_dataloader = DataLoader(validation_dataset,
+                                       shuffle=False,num_workers=0,
+                                       pin_memory=True,batch_size=batch_size)
+    testing_dataloader = DataLoader(testing_dataset,num_workers=0,
+                                       pin_memory=True,batch_size=batch_size)
+    if config["name"] == "basicUnet":
+        model = Basic3DUnet(input_channels=config['input_channels'],
+                            output_channel=numClasses,
+                            dropoutProb=config['dropout']) 
+    lambda_crossEntropy_val = 1- config["lambda_dice"]
+    
+    criterion = monai.losses.DiceCELoss(
+        include_background=False, softmax = True, to_onehot_y=True,
+        lambda_dice = config['lambda_dice'], lambda_ce = lambda_crossEntropy_val
+    )
+    
+    optimizer = optim.AdamW(model.parameters(),lr=config['lr'],weight_decay=config['weight_decay'])
+    
+    scheduler = CosineAnnealingWarmRestarts(
+        optimizer, T_0=config["T_0"], T_mult=config['T_mult'], eta_min = config['eta_min']
+    )
+    model = train.torch.prepare_model(
+    model,
+    parallel_strategy_kwargs={"find_unused_parameters": True}
+    )
+    training_dataloader = train.torch.prepare_data_loader(training_dataloader)
+    validation_dataloader = train.torch.prepare_data_loader(validation_dataloader)
+    testing_dataloader = train.torch.prepare_data_loader(testing_dataloader)
+    
+    device = train.torch.get_device()
+    model.to(device)
+    name = config['name']
+    scaler = GradScaler()
+    bestValidationDice = -1.0
+    best_model_state = None
+    
+    testDiceMetric = DiceMetric(include_background=False,reduction='mean')
+    postPrediction = AsDiscrete(argmax=True,to_onehot=numClasses) #add config element here
+    postMask = AsDiscrete(to_onehot=numClasses) #add config element here
+    for epoch in range(numTestEpochs):#Pass from cfg
+        trainingDice, trainingLoss = trainEpoch(model,device,training_dataloader,criterion,optimizer,scaler,epoch,numClasses=numClasses)
+        validationDice, validationLoss = validEpoch(model,device, validation_dataloader,criterion,numClasses=numClasses)
+        currentValidationDice = validationDice
+        if currentValidationDice > bestValidationDice:
+            bestValidationDice = currentValidationDice
+            best_model_state = model.state_dict().copy()
+        scheduler.step()
+        train.report({
+            "final_run_training_loss": trainingLoss,
+            "final_run_training_dice": trainingDice,
+            "final_run_validation_loss": validationLoss,
+            "final_run_validation_dice": validationDice,
+            "epoch": epoch  
+        })
+    if train.get_context().get_world_rank() == 0:
+        print("\n--- DEBUG: Entering model saving block ---")
+        storage_path = "/blue/uf-dsi/normansmith/projects/3DSegmentationLearning"
+    
+        model_save_dir = os.path.join(storage_path, "final_models")
+        print(f"DEBUG: Model save directory is: {model_save_dir}")
+        os.makedirs(model_save_dir, exist_ok=True)
+        save_path = os.path.join(model_save_dir, f"{name}.pth")
+        print(f"DEBUG: Attempting to save model to: {save_path}")
+        torch.save(best_model_state, save_path)
+    model.load_state_dict(best_model_state)
+    model.eval()
+        
+    with torch.no_grad():
+        for batch_data in testing_dataloader:
+            images, masks = batch_data["image"].to(device), batch_data["label"].to(device).long()
+            with autocast(device_type=device.type, dtype=torch.bfloat16):
+                outputs = model(images)
+            pred_onehot = [postPrediction(i) for i in decollate_batch(outputs)]
+            mask_onehot = [postMask(i) for i in decollate_batch(masks.unsqueeze(1))]
+            testDiceMetric(y_pred=pred_onehot,y=mask_onehot)
+
+    testOverallDice = testDiceMetric.aggregate().item()
+    testDiceMetric.reset()
+    train.report({"final_test_dice": testOverallDice})
+    return testOverallDice
+
+        
+        
+        
+        
+        
     
 @hydra.main(config_path='../configs',config_name="config",version_base=None)
 def main(cfg:DictConfig) -> None:
@@ -182,7 +285,9 @@ def main(cfg:DictConfig) -> None:
      base_config = {}
      base_config["training_dataset"] = train_datasetReference
      base_config["validation_dataset"] = validation_datasetReference
+     base_config["testing_dataset"] = testing_datasetReference
      base_config.update(cfg.training)
+     base_config.update(cfg.testing)
      model_static_params = {k: v for k, v in cfg.model.items() if k != 'search_space'}
      base_config.update(model_static_params)
     
@@ -201,11 +306,6 @@ def main(cfg:DictConfig) -> None:
                                       resources_per_worker={"CPU":cfg.ray_config.cpus_per_worker}),
      )
      
-    # trainableWithData = tune.with_parameters(
-     #    torch_trainer,
-      #   training_dataset= train_datasetReference,
-       #  validation_dataset = validation_datasetReference
-     #)
      scheduler = AsyncHyperBandScheduler(
          metric='validationDice',
          mode = "max",
@@ -225,6 +325,33 @@ def main(cfg:DictConfig) -> None:
     ) 
      
      results = tuner.fit()
+     best_result = results.get_best_result(metric="validationDice",mode="max")
+     
+     best_hyperparameters_from_sweep = best_result.config['train_loop_config']
+     final_config = base_config.copy()
+     final_config.update(best_hyperparameters_from_sweep)
+     
+     final_wandb_callback = WandbLoggerCallback(
+        project=cfg.wandb.project,
+        name="final-model-test-run",
+        config=final_config
+    )
+     final_trainer = TorchTrainer(
+        train_loop_per_worker=test,
+        train_loop_config=final_config,
+        torch_config=torch_config,
+        scaling_config=ScalingConfig(num_workers=cfg.ray_config.num_workers,
+                                     use_gpu=True,
+                                     resources_per_worker={"CPU":cfg.ray_config.cpus_per_worker}),
+        
+        run_config=train.RunConfig(
+            name="FinalModelTraining",
+            storage_path = "/blue/uf-dsi/normansmith/projects/3DSegmentationLearning",
+            callbacks=[final_wandb_callback]
+        ) 
+      )
+     final_result = final_trainer.fit()
+     
      
 
 if __name__ == "__main__":

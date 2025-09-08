@@ -1,0 +1,137 @@
+_wandb:
+    value:
+        cli_version: 0.21.3
+        e:
+            83g9sl102eb1e8tqxq8egeuun8wp1kd3:
+                codePath: scripts/training.py
+                codePathLocal: scripts/training.py
+                cpu_count: 112
+                cpu_count_logical: 112
+                cudaVersion: "12.8"
+                disk:
+                    /:
+                        total: "41922297856"
+                        used: "13401530368"
+                email: normansmith@ufl.edu
+                executable: /blue/uf-dsi/normansmith/.conda/envs/ThreeDSeg/bin/python
+                git:
+                    commit: 6152c12e5cb1807f7235e47c5eaa3e6e84fbc6f5
+                    remote: https://github.com/Norm90732/3DSegmentationLearning.git
+                gpu: NVIDIA B200
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Blackwell
+                      cudaCores: 18944
+                      memoryTotal: "192265846784"
+                      name: NVIDIA B200
+                      uuid: GPU-e2db1c74-9783-ab93-08a1-ead9b0c76888
+                    - architecture: Blackwell
+                      cudaCores: 18944
+                      memoryTotal: "192265846784"
+                      name: NVIDIA B200
+                      uuid: GPU-03aa6682-a76f-b13c-08c4-a49b9a58530f
+                host: c1009a-s15.ufhpc
+                memory:
+                    total: "2163693424640"
+                os: Linux-5.14.0-503.40.1.el9_5.x86_64-x86_64-with-glibc2.34
+                program: /blue/uf-dsi/normansmith/projects/3DSegmentationLearning/scripts/training.py
+                python: CPython 3.11.13
+                root: /blue/uf-dsi/normansmith/projects/3DSegmentationLearning
+                slurm:
+                    cluster_name: hipergator
+                    conf: /opt/slurm/etc/slurm.conf
+                    cpus_on_node: "35"
+                    cpus_per_task: "35"
+                    export_env: NONE
+                    get_user_env: "1"
+                    gpus_on_node: "2"
+                    gtids: "0"
+                    job_account: uf-dsi
+                    job_cpus_per_node: "35"
+                    job_end_time: "1757096348"
+                    job_gid: "3058"
+                    job_gpus: 0,2
+                    job_id: "11912582"
+                    job_name: sys/dashboard/sys/jupyter
+                    job_nodelist: c1009a-s15
+                    job_num_nodes: "1"
+                    job_partition: hpg-b200
+                    job_qos: uf-dsi
+                    job_start_time: "1757085548"
+                    job_uid: "2540"
+                    job_user: normansmith
+                    jobid: "11912582"
+                    localid: "0"
+                    mem_per_node: "262144"
+                    nnodes: "1"
+                    nodeid: "0"
+                    nodelist: c1009a-s15
+                    nprocs: "1"
+                    ntasks: "1"
+                    oom_kill_step: "0"
+                    prio_process: "0"
+                    procid: "0"
+                    submit_dir: /var/www/ood/apps/sys/dashboard
+                    submit_host: ondemand4.ufhpc
+                    task_pid: "3658512"
+                    tasks_per_node: "1"
+                    tmpdir: /scratch/local/11912582
+                    topology_addr: ibswb200.ibsw0908.c1009a-s15
+                    topology_addr_pattern: switch.switch.node
+                    tres_per_task: cpu=35
+                startedAt: "2025-09-05T15:49:12.176336Z"
+                writerId: 83g9sl102eb1e8tqxq8egeuun8wp1kd3
+        m: []
+        python_version: 3.11.13
+        t:
+            "1":
+                - 1
+                - 30
+                - 35
+                - 41
+                - 48
+                - 50
+            "2":
+                - 1
+                - 30
+                - 35
+                - 41
+                - 48
+                - 50
+            "3":
+                - 13
+                - 16
+            "4": 3.11.13
+            "5": 0.21.3
+            "12": 0.21.3
+            "13": linux-x86_64
+T_0:
+    value: 15
+T_mult:
+    value: 2
+batch_size:
+    value: 64
+dropout:
+    value: 0.1069371194301335
+eta_min:
+    value: 9.124385008045323e-06
+input_channels:
+    value: 1
+lambda_dice:
+    value: 0.4377992950664491
+lr:
+    value: 5.857141861997166e-05
+name:
+    value: basicUnet
+num_classes:
+    value: 2
+numEpochs:
+    value: 50
+testing_dataset:
+    value: ObjectRef(00ffffffffffffffffffffffffffffffffffffff0100000003e1f505)
+training_dataset:
+    value: ObjectRef(00ffffffffffffffffffffffffffffffffffffff0100000001e1f505)
+validation_dataset:
+    value: ObjectRef(00ffffffffffffffffffffffffffffffffffffff0100000002e1f505)
+weight_decay:
+    value: 0.0006995951558095379
