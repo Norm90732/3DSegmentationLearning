@@ -18,16 +18,19 @@ training:
   num_classes: 2
   batch_size: 64
 
+testing:
+  numEpochsTest: 400
+
 #Ray set up 
 ray_config:
   num_workers: 2
   cpus_per_worker: 5
-  max_concurrent_trials: 3
+  max_concurrent_trials: 2
   num_samples: 100
 
 
 #WANDB
 wandb:
-  project: "3DUnetSweep"
+  project: "3DUnetTestingPractice"
   log_config: True
 

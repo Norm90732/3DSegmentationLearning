@@ -1,0 +1,20 @@
+{
+  "train_loop_config": {
+    "T_0": 35,
+    "T_mult": 1,
+    "batch_size": 64,
+    "dropout": 0.2876981564369645,
+    "eta_min": 1.6280533910571025e-06,
+    "input_channels": 1,
+    "lambda_dice": 0.7708237138915102,
+    "lr": 4.064743796791852e-05,
+    "name": "basicUnet",
+    "numEpochs": 10,
+    "numEpochsTest": 10,
+    "num_classes": 2,
+    "testing_dataset": "ObjectRef(00ffffffffffffffffffffffffffffffffffffff0100000003e1f505)",
+    "training_dataset": "ObjectRef(00ffffffffffffffffffffffffffffffffffffff0100000001e1f505)",
+    "validation_dataset": "ObjectRef(00ffffffffffffffffffffffffffffffffffffff0100000002e1f505)",
+    "weight_decay": 0.001160992099376827
+  }
+}
