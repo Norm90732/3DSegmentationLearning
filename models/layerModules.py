@@ -61,8 +61,43 @@ class BottleNeckBlock(nn.Module):
         _, x = self.conv1(x)
         _, result = self.conv2(x)
         return result
+
+class FeedForward(nn.Module):
+    def __init__(self,embedDim,ffDim,bias:bool,dropout:float):
+        super(FeedForward,self).__init__()
+        self.linear1 = nn.Linear(embedDim,ffDim,bias=bias)
+        self.relu = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(dropout)
+        self.linear2 = nn.Linear(ffDim,embedDim,bias=bias)
+
+    def forward(self,x):
+        x = self.linear1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.linear2(x)
+        return x        
+    
+class Encoder(nn.Module):
+    def __init__(self,embedDim,ffDim,numHeads,dropoutMLP,dropoutAttention:float):
+        super().__init__()
         
+        self.multiHeadAttention = nn.MultiheadAttention(embed_dim = embedDim, 
+                                                        num_heads=numHeads, 
+                                                        dropout=dropoutAttention)
+        self.norm1 = nn.LayerNorm(embedDim)
+        self.norm2 = nn.LayerNorm(embedDim)
+        self.MLP = FeedForward(embedDim,ffDim,dropout=dropoutMLP,bias=True)
+        self.dropout = nn.Dropout(dropoutAttention)
+    def forward(self,x):
+        normx = self.norm1(x)
         
+        attention,_ = self.multiHeadAttention(query=normx,key=normx,value=normx,need_weights=False)
+        result1 = x +self.dropout(attention)
+        normx2 = self.norm2(result1)
+        mlp = self.MLP(normx2)
+        result = result1 + self.dropout(mlp)
+        return result
+
 """
 
 device = 'cuda'
