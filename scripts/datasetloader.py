@@ -10,7 +10,10 @@ from monai.transforms import (
     RandCropByPosNegLabeld,
     ScaleIntensityRanged,
     Spacingd,
+    SpatialPadd,
+    ResizeWithPadOrCropd
 )
+CROP_SIZE = (96, 96, 96) 
 train_transforms = Compose(
     [
         LoadImaged(keys=["image", "label"]),
@@ -26,10 +29,11 @@ train_transforms = Compose(
         CropForegroundd(keys=["image", "label"], source_key="image", allow_smaller=True),
         Orientationd(keys=["image", "label"], axcodes="RAS"),
         Spacingd(keys=["image", "label"], pixdim=(1.5, 1.5, 2.0), mode=("bilinear", "nearest")),
+        SpatialPadd(keys=["image", "label"], spatial_size=CROP_SIZE, method="end"),
         RandCropByPosNegLabeld(
             keys=["image", "label"],
             label_key="label",
-            spatial_size=(96, 96, 96),
+            spatial_size=CROP_SIZE,
             pos=1,
             neg=1,
             num_samples=4,
@@ -54,10 +58,11 @@ val_transforms = Compose(
         CropForegroundd(keys=["image", "label"], source_key="image", allow_smaller=True),
         Orientationd(keys=["image", "label"], axcodes="RAS"),
         Spacingd(keys=["image", "label"], pixdim=(1.5, 1.5, 2.0), mode=("bilinear", "nearest")),
+        SpatialPadd(keys=["image", "label"], spatial_size=CROP_SIZE, method="end"),
         RandCropByPosNegLabeld(
             keys=["image", "label"],
             label_key="label",
-            spatial_size=(96, 96, 96),
+            spatial_size=CROP_SIZE,
             pos=1,
             neg=0,
             num_samples=4,
@@ -68,9 +73,9 @@ val_transforms = Compose(
 )
 
 root_dir = "/home/normansmith/blue_storage/projects/3DSegmentationLearning/data"
-fulldataset_trainval = DecathlonDataset(root_dir=root_dir,task="Task09_Spleen",transform=None,download=False,seed=20,section='training')
+fulldataset_trainval = DecathlonDataset(root_dir=root_dir,task="Task08_HepaticVessel",transform=None,download=True,seed=20,section='training')
 training_dataset, validation_dataset = random_split(fulldataset_trainval,[.85,.15])
-test_dataset = DecathlonDataset(root_dir=root_dir,task="Task09_Spleen",transform=None,download=False,seed=20,section='validation')
+test_dataset = DecathlonDataset(root_dir=root_dir,task="Task08_HepaticVessel",transform=None,download=True,seed=20,section='validation')
 
 train_ds = Dataset(training_dataset,transform=train_transforms)
 validation_ds = Dataset(validation_dataset,transform=val_transforms)

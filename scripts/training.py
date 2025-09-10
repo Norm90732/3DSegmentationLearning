@@ -17,6 +17,7 @@ from monai.data.utils import decollate_batch
 import monai
 from models.layerModules import *
 from models.Basic3DUnet import *
+from models.TransUnet import * 
 import wandb
 
 #Ray
@@ -108,16 +109,31 @@ def objective(config):
     numEpochs = config["numEpochs"]
     
     training_dataloader = DataLoader(training_dataset,
-                                     shuffle=True,num_workers=0,pin_memory=True,batch_size=batch_size)
+                                     shuffle=True,num_workers=4,pin_memory=True,batch_size=batch_size)
     
     validation_dataloader = DataLoader(validation_dataset,
-                                       shuffle=False,num_workers=0,
+                                       shuffle=False,num_workers=4,
                                        pin_memory=True,batch_size=batch_size)
     
     if config["name"] == "basicUnet":
         model = Basic3DUnet(input_channels=config['input_channels'],
                             output_channel=numClasses,
                             dropoutProb=config['dropout']) 
+    elif config["name"] == "TransUnet":
+        model = TransUnet(input_channels=config['input_channels'],
+                          heightImg=config['heightImg'],
+                          widthImg=config['widthImg'],
+                          depthImg=config['depthImg'],
+                          patchsize=config['patchsize'],
+                          output_channel=numClasses,
+                          dropoutProb=config['dropoutProb'],
+                          embedDim=config['embedDim'],
+                          ffDim=config['ffDim'],
+                          numHeads=config['numHeads'],
+                          dropoutMLP=config['dropoutMLP'],
+                          dropoutAttention=config['dropoutAttention'],
+                          numEncoderBlock=config['numEncoderBlock'],
+                          )
     
     lambda_crossEntropy_val = 1- config["lambda_dice"]
     
@@ -174,17 +190,33 @@ def test(config):
     
     
     training_dataloader = DataLoader(training_dataset,
-                                     shuffle=True,num_workers=0,pin_memory=True,batch_size=batch_size)
+                                     shuffle=True,num_workers=4,pin_memory=True,batch_size=batch_size)
     
     validation_dataloader = DataLoader(validation_dataset,
-                                       shuffle=False,num_workers=0,
+                                       shuffle=False,num_workers=4,
                                        pin_memory=True,batch_size=batch_size)
-    testing_dataloader = DataLoader(testing_dataset,num_workers=0,
+    testing_dataloader = DataLoader(testing_dataset,num_workers=4,
                                        pin_memory=True,batch_size=batch_size)
     if config["name"] == "basicUnet":
         model = Basic3DUnet(input_channels=config['input_channels'],
                             output_channel=numClasses,
                             dropoutProb=config['dropout']) 
+    elif config["name"] == "TransUnet":
+        model = TransUnet(input_channels=config['input_channels'],
+                          heightImg=config['heightImg'],
+                          widthImg=config['widthImg'],
+                          depthImg=config['depthImg'],
+                          patchsize=config['patchsize'],
+                          output_channel=numClasses,
+                          dropoutProb=config['dropoutProb'],
+                          embedDim=config['embedDim'],
+                          ffDim=config['ffDim'],
+                          numHeads=config['numHeads'],
+                          dropoutMLP=config['dropoutMLP'],
+                          dropoutAttention=config['dropoutAttention'],
+                          numEncoderBlock=config['numEncoderBlock'],
+                          )
+        
     lambda_crossEntropy_val = 1- config["lambda_dice"]
     
     criterion = monai.losses.DiceCELoss(
@@ -235,10 +267,10 @@ def test(config):
         storage_path = "/blue/uf-dsi/normansmith/projects/3DSegmentationLearning"
     
         model_save_dir = os.path.join(storage_path, "final_models")
-        print(f"DEBUG: Model save directory is: {model_save_dir}")
+        print(f"Model save directory is: {model_save_dir}")
         os.makedirs(model_save_dir, exist_ok=True)
         save_path = os.path.join(model_save_dir, f"{name}.pth")
-        print(f"DEBUG: Attempting to save model to: {save_path}")
+        print(f"Attempting to save model to: {save_path}")
         torch.save(best_model_state, save_path)
     model.load_state_dict(best_model_state)
     model.eval()

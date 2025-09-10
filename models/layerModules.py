@@ -51,6 +51,26 @@ class DecoderBlock(nn.Module):
         _,postconv2 = self.conv2(postconv1)
         return postconv1
     
+class DecoderBlockForTransU(nn.Module):
+    def __init__(self,input_channel, output_channels,skipdim, kernel_size, padding, stride, dilation, dropoutProb,outputPadding):
+        super().__init__()
+        
+        self.uptranspose = nn.ConvTranspose3d(input_channel,out_channels=output_channels,kernel_size=kernel_size,padding=padding,stride=stride,dilation=dilation,output_padding=outputPadding)
+        self.batchnorm = nn.BatchNorm3d(output_channels)
+        self.activation = nn.ReLU()
+        
+        self.conv1 = ConvolutionalBlock(input_channels=output_channels+skipdim,output_channels=output_channels,kernel_size=3,padding=1,stride=1,dilation=1,dropoutprob=dropoutProb)
+        self.conv2 = ConvolutionalBlock(input_channels=output_channels,output_channels=output_channels,kernel_size=3,padding=1,stride=1,dilation=1,dropoutprob=dropoutProb)
+
+    def forward(self,x,skip):
+        x = self.uptranspose(x)
+        x = self.batchnorm(x)
+        x = self.activation(x)
+        x = torch.cat([x,skip],dim=1)
+        _,postconv1 = self.conv1(x)
+        _,postconv2 = self.conv2(postconv1)
+        return postconv1
+    
 class BottleNeckBlock(nn.Module):
     def __init__(self,input_channel, output_channels, kernel_size, padding, stride, dilation,dropoutProb):
         super().__init__()

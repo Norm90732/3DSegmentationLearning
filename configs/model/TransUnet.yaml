@@ -1,0 +1,18 @@
+name: TransUnet
+
+input_channels: 1
+heightImg: 12
+widthImg: 12
+depthImg: 12
+patchsize: 3
+
+
+search_space:
+  dropoutProb: "tune.uniform(0.1,0.5)"
+  embedDim: "tune.choice([768, 816, 864])"
+  ffDim: "tune.randint(2048, 4096)"
+  numHeads: "tune.choice([2,4,6,8])"
+  dropoutMLP: "tune.uniform(0.1,0.5)"
+  dropoutAttention: "tune.uniform(0.1,0.5)"
+  numEncoderBlock: "tune.choice([4, 6, 8])"
+

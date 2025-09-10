@@ -15,8 +15,8 @@ params:
 #Static
 training:
   numEpochs: 50
-  num_classes: 2
-  batch_size: 64
+  num_classes: 3
+  batch_size: 16
 
 testing:
   numEpochsTest: 400
@@ -26,11 +26,11 @@ ray_config:
   num_workers: 2
   cpus_per_worker: 5
   max_concurrent_trials: 2
-  num_samples: 100
+  num_samples: 50
 
 
 #WANDB
 wandb:
-  project: "3DUnetTestingPractice"
+  project: "3DUnetHepaticVessel"
   log_config: True
 
