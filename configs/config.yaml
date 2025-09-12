@@ -19,14 +19,14 @@ training:
   batch_size: 16
 
 testing:
-  numEpochsTest: 400
+  numEpochsTest: 330
 
 #Ray set up 
 ray_config:
   num_workers: 2
   cpus_per_worker: 5
-  max_concurrent_trials: 2
-  num_samples: 50
+  max_concurrent_trials: 3
+  num_samples: 60
 
 
 #WANDB
